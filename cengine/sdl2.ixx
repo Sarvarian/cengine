@@ -7,13 +7,6 @@ namespace SDL {
 	constexpr uint32_t SCREEN_WIDTH{ 640 };
 	constexpr uint32_t SCREEN_HEIGHT{ 480 };
 
-	export auto Log{ SDL_Log };
-	export auto GetError{ SDL_GetError };
-	export auto Delay{ SDL_Delay };
-	export auto FillRect{ SDL_FillRect };
-	export auto UpdateWindowSurface{ SDL_UpdateWindowSurface };
-	export auto MapRGB{ SDL_MapRGB };
-
 	export struct Init
 	{
 		const int err{ 1 };
@@ -39,7 +32,7 @@ SDL::Init::Init()
 	: err{ SDL_Init(SDL_INIT_VIDEO) }
 {
 	if (err != 0) {
-		SDL::Log("SDL_Init Failed. Code: '%d' SDL Message: '%s'", err, SDL::GetError());
+		SDL_Log("SDL_Init Failed. Code: '%d' SDL Message: '%s'", err, SDL_GetError());
 		is_not_valid = true;
 		return;
 	}
@@ -73,7 +66,7 @@ SDL::Window::Window()
 	surface{ SDL_GetWindowSurface(window) }
 {
 	if (window == nullptr) {
-		SDL::Log("SDL_CreateWindow Failed. SDL Message: '%s'", SDL::GetError());
+		SDL_Log("SDL_CreateWindow Failed. SDL Message: '%s'", SDL_GetError());
 		is_not_valid = true;
 		return;
 	}
@@ -83,7 +76,7 @@ SDL::Window::Window()
 	#endif
 
 	if (surface == nullptr) {
-		SDL::Log("SDL_GetWindowSurface Failed. SDL Message: '%s'", SDL::GetError());
+		SDL_Log("SDL_GetWindowSurface Failed. SDL Message: '%s'", SDL_GetError());
 		is_not_valid = true;
 		return;
 	}
