@@ -7,8 +7,7 @@ namespace SDL {
 	constexpr uint32_t SCREEN_WIDTH{ 640 };
 	constexpr uint32_t SCREEN_HEIGHT{ 480 };
 
-	export struct Init
-	{
+	export struct Init {
 		const int err{ 1 };
 		bool is_not_valid : 1 = true;
 		Init();

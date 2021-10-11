@@ -1,9 +1,6 @@
 #include <SDL_events.h>
 import SDL2;
 
-const char* f(void) { static const char* h{ "hello" }; return h; }
-
-
 int main(int argc, char* argv[])
 {
 	const SDL::Init sdl_init; if (sdl_init.is_not_valid) return -1;
