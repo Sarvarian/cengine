@@ -1,25 +1,37 @@
+#include <iostream>
+#include <stdexcept>
+#include <cstdlib>
 #include <SDL_events.h>
 import SDL2;
 
 int main(int argc, char* argv[])
 {
-	const SDL::Init sdl_init; if (sdl_init.is_not_valid) return -1;
-	const SDL::Window window; if (window.is_not_valid) return -1;
-
-	SDL_FillRect(window.surface, nullptr, SDL_MapRGB(window.surface->format, 0xFF, 0xFF, 0xFF));
-	SDL_UpdateWindowSurface(window.window);
-
-	bool is_running{ true };
-	while (is_running)
+	try
 	{
-		SDL_Event event{ 0 };
-		while ( SDL_PollEvent(&event) != 0)
+		const SDL::Init sdl_init; if (sdl_init.is_not_valid) return EXIT_FAILURE;
+		const SDL::Window window; if (window.is_not_valid) return EXIT_FAILURE;
+
+		SDL_FillRect(window.surface, nullptr, SDL_MapRGB(window.surface->format, 0xFF, 0xFF, 0xFF));
+		SDL_UpdateWindowSurface(window.window);
+
+		bool is_running{ true };
+		while (is_running)
 		{
-			if (event.type == SDL_QUIT) {
-				is_running = false;
+			SDL_Event event{ 0 };
+			while (SDL_PollEvent(&event) != 0)
+			{
+				if (event.type == SDL_QUIT)
+				{
+					is_running = false;
+				}
 			}
 		}
 	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

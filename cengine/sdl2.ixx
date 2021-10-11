@@ -3,11 +3,13 @@ module;
 
 export module SDL2;
 
-namespace SDL {
+namespace SDL
+{
 	constexpr uint32_t SCREEN_WIDTH{ 640 };
 	constexpr uint32_t SCREEN_HEIGHT{ 480 };
 
-	export struct Init {
+	export struct Init
+	{
 		const int err{ 1 };
 		bool is_not_valid : 1 = true;
 		Init();
@@ -16,7 +18,8 @@ namespace SDL {
 		Init(const Init&) = delete;
 	};
 
-	export struct Window {
+	export struct Window
+	{
 		SDL_Window* const window{ nullptr };
 		SDL_Surface* const surface{ nullptr };
 		bool is_not_valid : 1 = true;
@@ -30,7 +33,8 @@ namespace SDL {
 SDL::Init::Init()
 	: err{ SDL_Init(SDL_INIT_VIDEO) }
 {
-	if (err != 0) {
+	if (err != 0)
+	{
 		SDL_Log("SDL_Init Failed. Code: '%d' SDL Message: '%s'", err, SDL_GetError());
 		is_not_valid = true;
 		return;
@@ -64,7 +68,8 @@ SDL::Window::Window()
 	) },
 	surface{ SDL_GetWindowSurface(window) }
 {
-	if (window == nullptr) {
+	if (window == nullptr)
+	{
 		SDL_Log("SDL_CreateWindow Failed. SDL Message: '%s'", SDL_GetError());
 		is_not_valid = true;
 		return;
@@ -74,7 +79,8 @@ SDL::Window::Window()
 	SDL_Log("--- SDL_CreateWindow ---");
 	#endif
 
-	if (surface == nullptr) {
+	if (surface == nullptr)
+	{
 		SDL_Log("SDL_GetWindowSurface Failed. SDL Message: '%s'", SDL_GetError());
 		is_not_valid = true;
 		return;
