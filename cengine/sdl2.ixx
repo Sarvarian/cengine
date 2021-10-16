@@ -8,25 +8,31 @@ namespace SDL
 	constexpr uint32_t SCREEN_WIDTH{ 640 };
 	constexpr uint32_t SCREEN_HEIGHT{ 480 };
 
-	export struct Init
+	struct BaseRAII
+	{
+		BaseRAII() = default;
+		~BaseRAII() = default;
+		BaseRAII(BaseRAII&&) = default;
+		BaseRAII& operator=(BaseRAII&&) = delete;
+		BaseRAII(const BaseRAII&) = delete;
+		const BaseRAII& operator= (const BaseRAII&) = delete;
+	};
+
+	export struct Init : BaseRAII
 	{
 		const int err{ 1 };
 		bool is_not_valid : 1 = true;
 		Init();
 		~Init();
-		Init(Init&&) = default;
-		Init(const Init&) = delete;
 	};
 
-	export struct Window
+	export struct Window : BaseRAII
 	{
 		SDL_Window* const window{ nullptr };
 		SDL_Surface* const surface{ nullptr };
 		bool is_not_valid : 1 = true;
 		Window();
 		~Window();
-		Window(Window&&) = default;
-		Window(const Window&) = delete;
 	};
 }
 
