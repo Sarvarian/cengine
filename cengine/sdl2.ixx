@@ -14,8 +14,8 @@ namespace SDL
 		~BaseRAII() = default;
 		BaseRAII(BaseRAII&&) = delete;
 		BaseRAII(const BaseRAII&) = delete;
-		BaseRAII& operator=(BaseRAII&&) = delete;
-		BaseRAII& operator= (const BaseRAII&) = delete;
+		BaseRAII& operator = (BaseRAII&&) = delete;
+		BaseRAII& operator = (const BaseRAII&) = delete;
 	};
 
 	export struct Init : BaseRAII
