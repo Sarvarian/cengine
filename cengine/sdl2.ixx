@@ -28,7 +28,7 @@ namespace SDL
 	export struct GL : BaseRAII
 	{
 		const int load_library_err{ 1 };
-		GL();
+		GL(const int gl_major_version, const int gl_minor_version);
 		~GL();
 	};
 
@@ -71,6 +71,47 @@ SDL::Init::~Init()
 
 	#ifdef SDL_FULL_LOG
 	SDL_Log("--- SDL_Quit ---");
+	#endif
+}
+
+SDL::GL::GL(const int major, const int minor)
+	: load_library_err{ SDL_GL_LoadLibrary(NULL) }
+{
+	if (load_library_err != 0)
+	{
+		SDL_Log("SDL_GL_LoadLibrary Failed. SDL Message: '%s'", SDL_GetError());
+		is_not_valid = true;
+		return;
+	}
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_LoadLibrary ---");
+	#endif
+
+	auto error{ [&]() {
+		SDL_Log("SDL_GL_SetAttribute Failed. SDL Message: '%s'", SDL_GetError());
+		is_not_valid = true;
+	} };
+
+	if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) != 0) { error(); return; }
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major) != 0) { error(); return; }
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor) != 0) { error(); return; }
+	if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0) { error(); return; }
+	if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0) { error(); return; } // defaults to 16
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_SetAttribute ---");
+	#endif
+
+	is_not_valid = false;
+}
+
+SDL::GL::~GL()
+{
+	SDL_GL_UnloadLibrary();
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_UnloadLibrary ---");
 	#endif
 }
 
@@ -145,46 +186,5 @@ SDL::Context::~Context()
 
 	#if SDL_FULL_LOG
 	SDL_Log("--- SDL_GL_DeleteContext ---");
-	#endif
-}
-
-SDL::GL::GL()
-	: load_library_err{ SDL_GL_LoadLibrary(NULL) }
-{
-	if (load_library_err != 0)
-	{
-		SDL_Log("SDL_GL_LoadLibrary Failed. SDL Message: '%s'", SDL_GetError());
-		is_not_valid = true;
-		return;
-	}
-
-	#if SDL_FULL_LOG
-	SDL_Log("--- SDL_GL_LoadLibrary ---");
-	#endif
-
-	auto error{ [&]() {
-		SDL_Log("SDL_GL_SetAttribute Failed. SDL Message: '%s'", SDL_GetError());
-		is_not_valid = true;
-	} };
-
-	if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) != 0) { error(); return; }
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2) != 0) { error(); return; } // OpenGL 2.1
-	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1) != 0) { error(); return; } // OpenGL 2.1
-	if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0) { error(); return; }
-	if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0) { error(); return; } // defaults to 16
-
-	#if SDL_FULL_LOG
-	SDL_Log("--- SDL_GL_SetAttribute ---");
-	#endif
-
-	is_not_valid = false;
-}
-
-SDL::GL::~GL()
-{
-	SDL_GL_UnloadLibrary();
-
-	#if SDL_FULL_LOG
-	SDL_Log("--- SDL_GL_UnloadLibrary ---");
 	#endif
 }
