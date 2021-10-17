@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <glad\glad.h>
 #include <SDL_events.h>
 import SDL2;
 
@@ -10,6 +11,7 @@ int main(int argc, char* argv[])
 	{
 		const SDL::Init sdl_init; if (sdl_init.is_not_valid) return EXIT_FAILURE;
 		const SDL::Window window; if (window.is_not_valid) return EXIT_FAILURE;
+		const SDL::Context context{ window }; if (context.is_not_valid) return EXIT_FAILURE;
 
 		SDL_FillRect(window.surface, nullptr, SDL_MapRGB(window.surface->format, 0xFF, 0xFF, 0xFF));
 		SDL_UpdateWindowSurface(window.window);

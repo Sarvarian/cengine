@@ -1,8 +1,9 @@
 module;
+
 #include <SDL.h>
+#include <tuple>
 
 export module SDL2;
-
 namespace SDL
 {
 	constexpr uint32_t SCREEN_WIDTH{ 640 };
@@ -10,6 +11,7 @@ namespace SDL
 
 	struct BaseRAII
 	{
+		bool is_not_valid : 1 = true;
 		BaseRAII() = default;
 		~BaseRAII() = default;
 		BaseRAII(BaseRAII&&) = default;
@@ -21,7 +23,6 @@ namespace SDL
 	export struct Init : BaseRAII
 	{
 		const int err{ 1 };
-		bool is_not_valid : 1 = true;
 		Init();
 		~Init();
 	};
@@ -30,10 +31,38 @@ namespace SDL
 	{
 		SDL_Window* const window{ nullptr };
 		SDL_Surface* const surface{ nullptr };
-		bool is_not_valid : 1 = true;
 		Window();
 		~Window();
 	};
+
+	export struct Context : BaseRAII
+	{
+		const SDL_GLContext context{ nullptr };
+		Context(const SDL::Window& window);
+		~Context();
+	};
+
+	void set_gl_version()
+	{
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	}
+
+	SDL_Window* create_gl_window()
+	{
+		set_gl_version();
+		SDL_Window* window{
+			SDL_CreateWindow(
+				"SDL Tutorial",
+				SDL_WINDOWPOS_UNDEFINED,
+				SDL_WINDOWPOS_UNDEFINED,
+				SCREEN_WIDTH,
+				SCREEN_HEIGHT,
+				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+			)
+		};
+		return window;
+	}
 }
 
 SDL::Init::Init()
@@ -64,15 +93,8 @@ SDL::Init::~Init()
 
 SDL::Window::Window()
 	:
-	window{ SDL_CreateWindow(
-		"SDL Tutorial",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
-		SDL_WINDOW_SHOWN
-	) },
-	surface{ SDL_GetWindowSurface(window) }
+	window( SDL::create_gl_window() ),
+	surface( SDL_GetWindowSurface(window) )
 {
 	if (window == nullptr)
 	{
@@ -105,5 +127,31 @@ SDL::Window::~Window()
 
 	#if SDL_FULL_LOG
 	SDL_Log("--- SDL_DestroyWindow ---");
+	#endif
+}
+
+SDL::Context::Context(const SDL::Window& window)
+	: context{ SDL_GL_CreateContext(window.window) }
+{
+	if (context == nullptr)
+	{
+		SDL_Log("SDL_GL_CreateContext Failed. SDL Message: '%s'", SDL_GetError());
+		is_not_valid = true;
+		return;
+	}
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_CreateContext ---");
+	#endif
+
+	is_not_valid = false;
+}
+
+SDL::Context::~Context()
+{
+	SDL_GL_DeleteContext(context);
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_DeleteContext ---");
 	#endif
 }
