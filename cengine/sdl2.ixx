@@ -12,7 +12,7 @@ namespace SDL
 		bool is_not_valid : 1 = true;
 		BaseRAII() = default;
 		~BaseRAII() = default;
-		BaseRAII(BaseRAII&&) = default;
+		BaseRAII(BaseRAII&&) = delete;
 		BaseRAII(const BaseRAII&) = delete;
 		BaseRAII& operator=(BaseRAII&&) = delete;
 		BaseRAII& operator= (const BaseRAII&) = delete;
