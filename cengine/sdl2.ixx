@@ -28,7 +28,7 @@ namespace SDL
 	export struct GL : BaseRAII
 	{
 		const int load_library_err{ 1 };
-		GL(const int gl_major_version, const int gl_minor_version);
+		GL(const int major_version, const int minor_version);
 		~GL();
 	};
 
