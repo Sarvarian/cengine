@@ -1,7 +1,5 @@
 module;
-
 #include <SDL.h>
-#include <tuple>
 
 export module SDL2;
 namespace SDL
@@ -27,6 +25,13 @@ namespace SDL
 		~Init();
 	};
 
+	export struct GL : BaseRAII
+	{
+		const int load_library_err{ 1 };
+		GL();
+		~GL();
+	};
+
 	export struct Window : BaseRAII
 	{
 		SDL_Window* const window{ nullptr };
@@ -41,28 +46,6 @@ namespace SDL
 		Context(const SDL::Window& window);
 		~Context();
 	};
-
-	void set_gl_version()
-	{
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	}
-
-	SDL_Window* create_gl_window()
-	{
-		set_gl_version();
-		SDL_Window* window{
-			SDL_CreateWindow(
-				"SDL Tutorial",
-				SDL_WINDOWPOS_UNDEFINED,
-				SDL_WINDOWPOS_UNDEFINED,
-				SCREEN_WIDTH,
-				SCREEN_HEIGHT,
-				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
-			)
-		};
-		return window;
-	}
 }
 
 SDL::Init::Init()
@@ -93,7 +76,16 @@ SDL::Init::~Init()
 
 SDL::Window::Window()
 	:
-	window( SDL::create_gl_window() ),
+	window(
+		SDL_CreateWindow(
+			"SDL Tutorial",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			SCREEN_WIDTH,
+			SCREEN_HEIGHT,
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+		)
+	),
 	surface( SDL_GetWindowSurface(window) )
 {
 	if (window == nullptr)
@@ -153,5 +145,37 @@ SDL::Context::~Context()
 
 	#if SDL_FULL_LOG
 	SDL_Log("--- SDL_GL_DeleteContext ---");
+	#endif
+}
+
+SDL::GL::GL()
+	: load_library_err{ SDL_GL_LoadLibrary(NULL) }
+{
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2); // OpenGL 2.1
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1); // OpenGL 2.1
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // defaults to 16
+
+	if (load_library_err != 0)
+	{
+		SDL_Log("SDL_GL_LoadLibrary Failed. SDL Message: '%s'", SDL_GetError());
+		is_not_valid = true;
+		return;
+	}
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_LoadLibrary ---");
+	#endif
+
+	is_not_valid = false;
+}
+
+SDL::GL::~GL()
+{
+	SDL_GL_UnloadLibrary();
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_UnloadLibrary ---");
 	#endif
 }
