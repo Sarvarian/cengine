@@ -151,12 +151,6 @@ SDL::Context::~Context()
 SDL::GL::GL()
 	: load_library_err{ SDL_GL_LoadLibrary(NULL) }
 {
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2); // OpenGL 2.1
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1); // OpenGL 2.1
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // defaults to 16
-
 	if (load_library_err != 0)
 	{
 		SDL_Log("SDL_GL_LoadLibrary Failed. SDL Message: '%s'", SDL_GetError());
@@ -166,6 +160,21 @@ SDL::GL::GL()
 
 	#if SDL_FULL_LOG
 	SDL_Log("--- SDL_GL_LoadLibrary ---");
+	#endif
+
+	auto error{ [&]() {
+		SDL_Log("SDL_GL_SetAttribute Failed. SDL Message: '%s'", SDL_GetError());
+		is_not_valid = true;
+	} };
+
+	if (SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) != 0) { error(); return; }
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2) != 0) { error(); return; } // OpenGL 2.1
+	if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1) != 0) { error(); return; } // OpenGL 2.1
+	if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0) { error(); return; }
+	if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) != 0) { error(); return; } // defaults to 16
+
+	#if SDL_FULL_LOG
+	SDL_Log("--- SDL_GL_SetAttribute ---");
 	#endif
 
 	is_not_valid = false;
