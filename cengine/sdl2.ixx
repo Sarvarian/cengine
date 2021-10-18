@@ -46,6 +46,22 @@ namespace SDL
 		Context(const SDL::Window& window);
 		~Context();
 	};
+
+	export void set_swap_interval()
+	{
+		if (SDL_GL_SetSwapInterval(-1) == 0)
+		{
+			SDL_Log("--- SDL_GL_SetSwapInterval(-1) ---");
+		}
+		else if (SDL_GL_SetSwapInterval(1) == 0)
+		{
+			SDL_Log("--- SDL_GL_SetSwapInterval(1) ---");
+		}
+		else
+		{
+			SDL_Log("SDL_GL_SetSwapInterval Failed. SDL Message: '%s'", SDL_GetError());
+		}
+	}
 }
 
 SDL::Init::Init()
@@ -187,56 +203,4 @@ SDL::Context::~Context()
 	#if SDL_FULL_LOG
 	SDL_Log("--- SDL_GL_DeleteContext ---");
 	#endif
-}
-
-
-namespace SDL
-{
-	export struct BaseThread
-	{
-		bool is_not_valid : 1 = true;
-		inline bool should_exit();
-
-	protected:
-		BaseThread(SDL_ThreadFunction fn, const char* name, void* data);
-		~BaseThread();
-		inline void set_exit() { SDL_AtomicSet(&exit, 1); }
-
-	private:
-		SDL_Thread* handle{ nullptr };
-		SDL_atomic_t exit;
-		BaseThread(BaseThread&&) = delete;
-		BaseThread(const BaseThread&) = delete;
-		BaseThread& operator = (BaseThread&&) = delete;
-		BaseThread& operator = (const BaseThread&) = delete;
-	};
-}
-
-SDL::BaseThread::BaseThread(SDL_ThreadFunction fn, const char* name, void* data)
-	: handle(SDL_CreateThread(fn, name, data))
-{
-	SDL_AtomicSet(&exit, 0);
-	if (handle == nullptr)
-	{
-		SDL_Log("SDL_CreateThread Failed. SDL Message: '%s'", SDL_GetError());
-		is_not_valid = true;
-		return;
-	}
-	else
-	{
-		is_not_valid = false;
-		return;
-	}
-}
-
-SDL::BaseThread::~BaseThread()
-{
-	SDL_AtomicSet(&exit, 1);
-	int res{ 0 };
-	SDL_WaitThread(handle, &res);
-}
-
-bool SDL::BaseThread::should_exit()
-{
-	return SDL_AtomicGet(&exit);
 }

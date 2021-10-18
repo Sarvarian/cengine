@@ -3,14 +3,15 @@ module;
 #include <stdexcept>
 #include <cstdlib>
 #include <glad\glad.h>
-#include <SDL_events.h>
-#include <SDL_timer.h>
+#include <SDL_log.h>
+#include <SDL_video.h>
 
 export module GLThread;
 import SDL2;
+import SDL2Thread;
 import GLBuffer;
 
-export struct GLThread : SDL::BaseThread
+export struct GLThread : SDLThread
 {
 	GLThread(const SDL::Window&);
 	~GLThread();
@@ -21,7 +22,7 @@ private:
 };
 
 GLThread::GLThread(const SDL::Window& window)
-	: BaseThread(run, "GLThread", this), window(window)
+	: SDLThread(run, "GLThread", this), window(window)
 {}
 
 GLThread::~GLThread()
@@ -38,13 +39,14 @@ int GLThread::run(void* __in_data_ptr)
 
 	// Initializations.
 	const SDL::Context context{ window }; if (context.is_not_valid) { return EXIT_FAILURE; }
-
-	std::cout << "SDL_GL_SetSwapInterval: " << SDL_GL_SetSwapInterval(0) << std::endl;
+	SDL::set_swap_interval();
 
 	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
+	printf("\n");
 	printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 	printf("Renderer: %s\n", glGetString(GL_RENDERER));
 	printf("Version:  %s\n", glGetString(GL_VERSION));
+	printf("\n");
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);

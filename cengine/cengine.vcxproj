@@ -152,6 +152,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="process_manager.ixx" />
     <ClCompile Include="sdl2.ixx" />
+    <ClCompile Include="sdl2_thread.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\glad\glad.vcxproj">
