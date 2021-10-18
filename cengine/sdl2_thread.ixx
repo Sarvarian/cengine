@@ -3,28 +3,28 @@ module;
 #include <SDL_log.h>
 
 export module SDL2;
-namespace SDL2
+namespace SDL
 {
-	export struct ThreadBase
+	export struct BaseThread
 	{
 		bool is_not_valid : 1 = true;
 
 	protected:
-		ThreadBase(SDL_ThreadFunction fn, const char* name, void* data);
-		~ThreadBase();
+		BaseThread(SDL_ThreadFunction fn, const char* name, void* data);
+		~BaseThread();
 		inline bool should_exit();
 
 	private:
 		SDL_Thread* handle{ nullptr };
 		SDL_atomic_t exit;
-		ThreadBase(ThreadBase&&) = delete;
-		ThreadBase(const ThreadBase&) = delete;
-		ThreadBase& operator = (ThreadBase&&) = delete;
-		ThreadBase& operator = (const ThreadBase&) = delete;
+		BaseThread(BaseThread&&) = delete;
+		BaseThread(const BaseThread&) = delete;
+		BaseThread& operator = (BaseThread&&) = delete;
+		BaseThread& operator = (const BaseThread&) = delete;
 	};
 }
 
-SDL2::ThreadBase::ThreadBase(SDL_ThreadFunction fn, const char* name, void* data)
+SDL::BaseThread::BaseThread(SDL_ThreadFunction fn, const char* name, void* data)
 	: handle(SDL_CreateThread(fn, name, data))
 {
 	SDL_AtomicSet(&exit, 0);
@@ -41,14 +41,14 @@ SDL2::ThreadBase::ThreadBase(SDL_ThreadFunction fn, const char* name, void* data
 	}
 }
 
-SDL2::ThreadBase::~ThreadBase()
+SDL::BaseThread::~BaseThread()
 {
 	SDL_AtomicSet(&exit, 1);
 	int res{ 0 };
 	SDL_WaitThread(handle, &res);
 }
 
-bool SDL2::ThreadBase::should_exit()
+bool SDL::BaseThread::should_exit()
 {
 	return SDL_AtomicGet(&exit);
 }
