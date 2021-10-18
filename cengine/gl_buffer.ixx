@@ -28,7 +28,7 @@ namespace GLBuffer
 	};
 
 
-	struct Buffer : BaseRAII
+	export struct Buffer : BaseRAII
 	{
 	private:
 		Buffer() = default;
@@ -71,7 +71,7 @@ namespace GLBuffer
 	export struct Head : BaseRAII
 	{
 		Head() : tail{ hub } {}
-		~Head() = default;
+		~Head() {}
 		inline Buffer& next() { return hub.main_next(); }
 		inline Tail& get_tail() { return tail; }
 	private:
@@ -87,7 +87,6 @@ GLBuffer::Buffer& GLBuffer::Hub::gl_next()
 	{
 		if (SDL_CondWait(cond, mutex) != 0)
 		{
-
 			return *gl_buffer;
 		}
 	}
