@@ -21,5 +21,11 @@
     <ClCompile Include="sdl2.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="process_manager.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glbuffer.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
