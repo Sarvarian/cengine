@@ -1,4 +1,5 @@
 module;
+#include <SDL_mutex.h>
 #include <tuple>
 #include <iostream>
 
@@ -18,6 +19,15 @@ namespace GLBuffer
 	};
 
 
+	struct MutexLock : BaseRAII
+	{
+		MutexLock(SDL_mutex* mutex) : mutex(mutex) { SDL_LockMutex(mutex); }
+		~MutexLock() { SDL_UnlockMutex(mutex); }
+	private:
+		SDL_mutex* mutex{ nullptr };
+	};
+
+
 	struct Buffer : BaseRAII
 	{
 	private:
@@ -29,11 +39,17 @@ namespace GLBuffer
 
 	struct Hub : BaseRAII
 	{
-		Buffer* gl_next() { return nullptr; }
-		Buffer& main_next() { return buffers[0]; }
+		Buffer* gl_next();
+		Buffer& main_next();
 
 	private:
 		Buffer buffers[3];
+		SDL_mutex* mutex{ SDL_CreateMutex() };
+
+		Buffer* gl_buffer{ &buffers[0] };
+		Buffer* main_buffer{ &buffers[1] };
+		Buffer* ready_buffer{ nullptr };
+		Buffer* outdated{ &buffers[2] };
 
 		Hub() = default;
 		~Hub() = default;
@@ -63,8 +79,29 @@ namespace GLBuffer
 	};
 }
 
+GLBuffer::Buffer* GLBuffer::Hub::gl_next()
+{
+	MutexLock lock{ mutex };
+	if (ready_buffer == nullptr) { return nullptr; }
+	outdated = gl_buffer;
+	gl_buffer = ready_buffer;
+	ready_buffer = nullptr;
+	return gl_buffer;
+}
+
+GLBuffer::Buffer& GLBuffer::Hub::main_next()
+{
+	MutexLock lock{ mutex };
+	ready_buffer = main_buffer;
+	main_buffer = outdated;
+	outdated = ready_buffer;
+	return *main_buffer;
+}
+
 export void glbuffer_user()
 {
 	GLBuffer::Head head;
+	std::cout << std::endl;
 	std::cout << "size: " << sizeof(head) << std::endl;
+	std::cout << std::endl;
 }
