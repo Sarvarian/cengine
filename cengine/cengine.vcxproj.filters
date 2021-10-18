@@ -27,5 +27,8 @@
     <ClCompile Include="glbuffer.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sdl2_thread.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

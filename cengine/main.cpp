@@ -5,14 +5,14 @@
 #include <SDL_events.h>
 #include <SDL_timer.h>
 import SDL2;
-import ProcessManager;
+import ProcessManager;
+
 
 int main(int argc, char* argv[])
 {
 	try
 	{
 		const SDL::Init sdl_init;             if (sdl_init.is_not_valid) { return EXIT_FAILURE; }
-
 		const SDL::GL sdl_gl{ 2, 1 };         if (sdl_gl.is_not_valid) { return EXIT_FAILURE; }
 		const SDL::Window window;             if (window.is_not_valid) { return EXIT_FAILURE; }
 		const SDL::Context context{ window }; if (context.is_not_valid) { return EXIT_FAILURE; }

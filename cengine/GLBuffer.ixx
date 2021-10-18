@@ -39,12 +39,13 @@ namespace GLBuffer
 
 	struct Hub : BaseRAII
 	{
-		Buffer* gl_next();
+		Buffer& gl_next();
 		Buffer& main_next();
 
 	private:
 		Buffer buffers[3];
 		SDL_mutex* mutex{ SDL_CreateMutex() };
+		SDL_cond* cond{ SDL_CreateCond() };
 
 		Buffer* gl_buffer{ &buffers[0] };
 		Buffer* main_buffer{ &buffers[1] };
@@ -59,7 +60,7 @@ namespace GLBuffer
 
 	export struct Tail : BaseRAII
 	{
-		inline Buffer* next() { return hub.gl_next(); }
+		inline Buffer& next() { return hub.gl_next(); }
 	private:
 		Hub& hub;
 		Tail(Hub& hub) : hub{ hub } {}
@@ -79,19 +80,27 @@ namespace GLBuffer
 	};
 }
 
-GLBuffer::Buffer* GLBuffer::Hub::gl_next()
+GLBuffer::Buffer& GLBuffer::Hub::gl_next()
 {
 	MutexLock lock{ mutex };
-	if (ready_buffer == nullptr) { return nullptr; }
+	if (ready_buffer == nullptr)
+	{
+		if (SDL_CondWait(cond, mutex) != 0)
+		{
+
+			return *gl_buffer;
+		}
+	}
 	outdated = gl_buffer;
 	gl_buffer = ready_buffer;
 	ready_buffer = nullptr;
-	return gl_buffer;
+	return *gl_buffer;
 }
 
 GLBuffer::Buffer& GLBuffer::Hub::main_next()
 {
 	MutexLock lock{ mutex };
+	if (ready_buffer == nullptr) { SDL_CondSignal(cond); }
 	ready_buffer = main_buffer;
 	main_buffer = outdated;
 	outdated = ready_buffer;
