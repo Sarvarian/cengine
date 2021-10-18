@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 		const SDL::GL sdl_gl{ 2, 1 }; if (sdl_gl.is_not_valid) { return EXIT_FAILURE; }
 		const SDL::Window window;     if (window.is_not_valid) { return EXIT_FAILURE; }
 
-		GLThread glt(window);
+		GLThread glt{ window };
 
 		bool is_running{ true };
 		while (is_running)
