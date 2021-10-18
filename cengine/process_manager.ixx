@@ -5,7 +5,8 @@ module;
 #include <iostream>
 
 export module ProcessManager;
-import GLBuffer;
+import GLBuffer;
+
 export struct ProcessManager
 {
 	int run();
