@@ -147,7 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="glbuffer.ixx" />
+    <ClCompile Include="gl_buffer.ixx" />
+    <ClCompile Include="gl_thread.ixx" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="process_manager.ixx" />
     <ClCompile Include="sdl2.ixx" />

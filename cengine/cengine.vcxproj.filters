@@ -24,10 +24,13 @@
     <ClCompile Include="process_manager.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="glbuffer.ixx">
+    <ClCompile Include="gl_buffer.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sdl2_thread.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_thread.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
